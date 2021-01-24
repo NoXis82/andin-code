@@ -40,4 +40,24 @@ class PostService(private val repository: PostRepository) {
         }.toDto()
 
     fun removeById(id: Long): Unit = repository.deleteById(id)
+
+    fun likeById(id: Long): Post = repository
+        .findById(id)
+        .orElseThrow(::NotFoundException)
+        .apply {
+            likes += 1
+            likedByMe = true
+            repository.save(this)
+        }
+        .toDto()
+
+    fun unlikeById(id: Long): Post = repository
+        .findById(id)
+        .orElseThrow(::NotFoundException)
+        .apply {
+            if(likes > 0) {likes -= 1}
+            likedByMe = false
+            repository.save(this)
+        }
+        .toDto()
 }
