@@ -2,25 +2,25 @@ package ru.netology.nmedia.service
 
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.exception.NotFoundException
 import ru.netology.nmedia.repository.PostRepository
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 @Service
+@Transactional
 class PostService(private val repository: PostRepository) {
     fun getAll(): List<Post> = repository
-            .findAll(Sort.by(Sort.Direction.DESC, "id"))
-            .map { it.toDto() }
+        .findAll(Sort.by(Sort.Direction.DESC, "id"))
+        .map { it.toDto() }
 
     fun getById(id: Long): Post = repository
-            .findById(id)
-            .map { it.toDto() }
-            .orElseThrow(::NotFoundException)
+        .findById(id)
+        .map { it.toDto() }
+        .orElseThrow(::NotFoundException)
 
     fun save(dto: Post): Post = repository
         .findById(dto.id)
@@ -47,7 +47,6 @@ class PostService(private val repository: PostRepository) {
         .apply {
             likes += 1
             likedByMe = true
-            repository.save(this)
         }
         .toDto()
 
@@ -55,9 +54,8 @@ class PostService(private val repository: PostRepository) {
         .findById(id)
         .orElseThrow(::NotFoundException)
         .apply {
-            if(likes > 0) {likes -= 1}
+            likes -= 1
             likedByMe = false
-            repository.save(this)
         }
         .toDto()
 }
